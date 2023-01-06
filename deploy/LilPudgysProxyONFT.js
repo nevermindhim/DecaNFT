@@ -10,9 +10,10 @@ module.exports = async function ({ deployments, getNamedAccounts }) {
 
     await deploy("LilPudgysProxyONFT", {
         from: deployer,
-        args: [lzEndpointAddress, "0x524cAB2ec69124574082676e6F654a18df49A048"],
+        args: [lzEndpointAddress, "0x524cAB2ec69124574082676e6F654a18df49A048"], // mainnet
+        // args: [lzEndpointAddress, "0x8DbA4bf660FF33f1abb8E41915125F068B35c6fD"], // testnet
         log: true,
-        waitConfirmations: 1,
+        waitConfirmations: 3,
     })
 
     await hre.run("verifyContract", { contract: "LilPudgysProxyONFT" })

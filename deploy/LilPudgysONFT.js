@@ -10,9 +10,10 @@ module.exports = async function ({ deployments, getNamedAccounts }) {
 
     await deploy("LilPudgysONFT", {
         from: deployer,
-        args: ["https://api.pudgypenguins.io/lil/", "LilPudgys", "LP", lzEndpointAddress],
+        args: ["https://api.pudgypenguins.io/lil/", "LilPudgys", "LP", lzEndpointAddress], // mainnet
+        // args: ["https://api.pudgypenguins.io/lil/", "LilPudgys", "LP", lzEndpointAddress], // testnet
         log: true,
-        waitConfirmations: 1,
+        waitConfirmations: 3,
     })
 
     await hre.run("verifyContract", { contract: "LilPudgysONFT" })
