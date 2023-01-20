@@ -9,7 +9,7 @@ contract LilPudgysONFT is ONFT721 {
     string public baseTokenURI;
     uint256 public constant MAX_ELEMENTS = 22222;
 
-    constructor(string memory baseURI, string memory _name, string memory _symbol, address _lzEndpoint) ONFT721(_name, _symbol, _lzEndpoint) {
+    constructor(string memory baseURI, string memory _name, string memory _symbol, uint256 _minGasToTransfer, address _lzEndpoint) ONFT721(_name, _symbol, _minGasToTransfer, _lzEndpoint) {
         setBaseURI(baseURI);
     }
 
@@ -23,7 +23,7 @@ contract LilPudgysONFT is ONFT721 {
 
         uint256 key = 0;
         for (uint256 i = 0; i < MAX_ELEMENTS; i++) {
-            if(rawOwnerOf(i) == _owner){
+            if(_ownerOf(i) == _owner){
                 tokensId[key] = i;
                 key++;
                 if(key == tokenCount){break;}
