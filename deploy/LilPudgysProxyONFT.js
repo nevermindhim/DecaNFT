@@ -11,29 +11,29 @@ module.exports = async function ({ deployments, getNamedAccounts }) {
 
     await deploy("LilPudgysProxyONFT", {
         from: deployer,
-        // args: [100000, lzEndpointAddress, "0x524cAB2ec69124574082676e6F654a18df49A048"], // mainnet
-        args: [100000, lzEndpointAddress, "0x8DbA4bf660FF33f1abb8E41915125F068B35c6fD"], // testnet
+        args: [150000, lzEndpointAddress, "0x524cAB2ec69124574082676e6F654a18df49A048"], // mainnet
+        // args: [100000, lzEndpointAddress, "0x8DbA4bf660FF33f1abb8E41915125F068B35c6fD"], // testnet
         log: true,
         waitConfirmations: 3,
         skipIfAlreadyDeployed: true
     })
 
-    // let onft = await ethers.getContract("LilPudgysProxyONFT")
-    //
-    // // let enabledChains = ["ethereum", "bsc", "arbitrum", "polygon"] // mainnet
+    let onft = await ethers.getContract("LilPudgysProxyONFT")
+
+    let enabledChains = ["ethereum", "bsc", "arbitrum", "polygon"] // mainnet
     // let enabledChains = ["ethereum-goerli", "arbitrum-goerli"] // testnet
-    //
-    // if (enabledChains.includes(hre.network.name)) {
-    //     await(await onft.setMinGasToTransferAndStore(140000)).wait()
-    //
-    //     for (let n of enabledChains) {
-    //         if (n != hre.network.name) {
-    //             await(await onft.setDstChainIdToTransferGas(CHAIN_IDS[n], 40000)).wait()
-    //             await(await onft.setDstChainIdToBatchLimit(CHAIN_IDS[n], 25)).wait()
-    //             await(await onft.setMinDstGas(CHAIN_IDS[n], 1, 150000)).wait()
-    //         }
-    //     }
-    // }
+
+    if (enabledChains.includes(hre.network.name)) {
+        // await(await onft.setMinGasToTransferAndStore(150000)).wait()
+
+        for (let n of enabledChains) {
+            if (n != hre.network.name) {
+                await(await onft.setDstChainIdToTransferGas(CHAIN_IDS[n], 50000)).wait()
+                await(await onft.setDstChainIdToBatchLimit(CHAIN_IDS[n], 25)).wait()
+                await(await onft.setMinDstGas(CHAIN_IDS[n], 1, 150000)).wait()
+            }
+        }
+    }
 
     await hre.run("verifyContract", { contract: "LilPudgysProxyONFT" })
 }

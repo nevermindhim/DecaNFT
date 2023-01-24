@@ -11,5 +11,11 @@ task(
     .addOptionalParam("remoteContract", "Name of remote contract if the names are different")
     .addOptionalParam("contract", "If both contracts are the same name")
 
+//
+task("sendToken", "send an ONFT nftId from one chain to another", require("./sendToken"))
+    .addParam("targetNetwork", "the chainId to transfer to")
+
+task("clearCredits", "clear credits", require("./clearCredits"))
+
 task("verifyContract", "", require("./verifyContract.js"))
     .addParam("contract", "contract name")
