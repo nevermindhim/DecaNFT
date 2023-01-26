@@ -19,3 +19,5 @@ task("clearCredits", "clear credits", require("./clearCredits"))
 
 task("verifyContract", "", require("./verifyContract.js"))
     .addParam("contract", "contract name")
+
+task("transferOwnership", "", require("./transferOwnership.js"))
