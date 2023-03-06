@@ -5,12 +5,7 @@ module.exports = async function (taskArgs, hre) {
     const owner = signers[0]
     const toAddress = owner.address;
     const remoteChainId = CHAIN_ID[taskArgs.targetNetwork]
-    const tokenIds = [
-        // 13473, //  fe team
-        // 80, // fe team
-        // 16756, // fe team
-        // 10017 // fe team
-    ]
+    const tokenIds = []
 
     console.log(`Owner: ${toAddress}`)
 

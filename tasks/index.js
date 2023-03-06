@@ -1,7 +1,5 @@
 task("getSigners", "show the signers of the current mnemonic", require("./getSigners")).addOptionalParam("n", "how many to show", 3, types.int)
 
-
-//
 task(
     "setTrustedRemote",
     "setTrustedRemote(chainId, sourceAddr) to enable inbound/outbound messages with your other contracts",
@@ -11,7 +9,6 @@ task(
     .addOptionalParam("remoteContract", "Name of remote contract if the names are different")
     .addOptionalParam("contract", "If both contracts are the same name")
 
-//
 task("sendToken", "send an ONFT nftId from one chain to another", require("./sendToken"))
     .addParam("targetNetwork", "the chainId to transfer to")
 
