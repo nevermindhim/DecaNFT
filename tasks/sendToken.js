@@ -9,7 +9,7 @@ module.exports = async function (taskArgs, hre) {
 
     console.log(`Owner: ${toAddress}`)
 
-    let onft = hre.network.name == "ethereum" ? await ethers.getContract("LilPudgysProxyONFT") : await ethers.getContract("LilPudgysONFT")
+    let onft = hre.network.name == "ethereum" ? await ethers.getContract("DecaProxyNFT") : await ethers.getContract("DecaNFT")
     let minGasToTransferAndStore = await onft.minDstGasLookup(remoteChainId, 1)
     let transferGasPerToken = await onft.dstChainIdToTransferGas(remoteChainId)
     let adapterParams = ethers.utils.solidityPack(["uint16", "uint256"], [1, minGasToTransferAndStore.add(transferGasPerToken.mul(tokenIds.length))])

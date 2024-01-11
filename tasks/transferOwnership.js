@@ -1,6 +1,6 @@
 module.exports = async function (taskArgs, hre) {
 
-    let onft = hre.network.name == "ethereum" ? await ethers.getContract("LilPudgysProxyONFT") : await ethers.getContract("LilPudgysONFT")
+    let onft = hre.network.name == "ethereum" ? await ethers.getContract("DecaProxyNFT") : await ethers.getContract("DecaNFT")
 
     let multisigs = {
         "ethereum":  "0xD467121EFEaE6Bd4F016eF7D1F4d4f37B0d91cA9" ,

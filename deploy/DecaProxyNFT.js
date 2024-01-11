@@ -9,7 +9,7 @@ module.exports = async function ({ deployments, getNamedAccounts }) {
     const lzEndpointAddress = LZ_ENDPOINTS[hre.network.name]
     console.log(`[${hre.network.name}] Endpoint Address: ${lzEndpointAddress}`)
 
-    await deploy("LilPudgysProxyONFT", {
+    await deploy("DecaProxyNFT", {
         from: deployer,
         args: [150000, lzEndpointAddress, "0x524cAB2ec69124574082676e6F654a18df49A048"], // mainnet
         // args: [100000, lzEndpointAddress, "0x8DbA4bf660FF33f1abb8E41915125F068B35c6fD"], // testnet
@@ -18,7 +18,7 @@ module.exports = async function ({ deployments, getNamedAccounts }) {
         skipIfAlreadyDeployed: true
     })
 
-    let onft = await ethers.getContract("LilPudgysProxyONFT")
+    let onft = await ethers.getContract("DecaProxyNFT")
 
     let enabledChains = ["ethereum", "bsc", "arbitrum", "polygon"] // mainnet
     // let enabledChains = ["ethereum-goerli", "arbitrum-goerli"] // testnet
@@ -35,7 +35,7 @@ module.exports = async function ({ deployments, getNamedAccounts }) {
         }
     }
 
-    await hre.run("verifyContract", { contract: "LilPudgysProxyONFT" })
+    await hre.run("verifyContract", { contract: "DecaProxyNFT" })
 }
 
-module.exports.tags = ["LilPudgysProxyONFT"]
+module.exports.tags = ["DecaProxyNFT"]

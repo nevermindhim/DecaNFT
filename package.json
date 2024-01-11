@@ -1,12 +1,12 @@
 {
-  "name": "@layerzerolabs/lil-pudgy-onft",
+  "name": "@layerzerolabs/DecaNFT",
   "version": "0.0.1",
   "license": "MIT",
   "files": [
     "artifacts/",
     "contracts/"
   ],
-  "description": "lil-pudgy-onft",
+  "description": "Decanft",
   "main": "index.js",
   "scripts": {
     "test": "npx hardhat test",

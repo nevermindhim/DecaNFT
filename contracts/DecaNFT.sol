@@ -5,9 +5,11 @@ pragma abicoder v2;
 
 import "@layerzerolabs/solidity-examples/contracts/token/onft/ONFT721.sol";
 
-contract LilPudgysONFT is ONFT721 {
+contract DecaNFT is ONFT721 {
     string public baseTokenURI;
-    uint256 public constant MAX_ELEMENTS = 22222;
+    string public prerevealTokenURI;
+    bool public revealed;
+    uint256 public constant MAX_ELEMENTS = 2024;
 
     constructor(string memory baseURI, string memory _name, string memory _symbol, uint256 _minGasToTransfer, address _lzEndpoint) ONFT721(_name, _symbol, _minGasToTransfer, _lzEndpoint) {
         setBaseURI(baseURI);
@@ -39,5 +41,13 @@ contract LilPudgysONFT is ONFT721 {
 
     function _baseURI() internal view virtual override returns (string memory) {
         return baseTokenURI;
+    }
+
+    function setPrerevealTokenURI(string memory prerevealURI) public onlyOwner {
+        prerevealTokenURI = prerevealURI;
+    }
+
+    function setRevealed(bool _revealed) public onlyOwner {
+        revealed = _revealed;
     }
 }

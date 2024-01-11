@@ -9,16 +9,15 @@ module.exports = async function ({ deployments, getNamedAccounts }) {
     const lzEndpointAddress = LZ_ENDPOINTS[hre.network.name]
     console.log(`[${hre.network.name}] Endpoint Address: ${lzEndpointAddress}`)
 
-    await deploy("LilPudgysONFT", {
+    await deploy("DecaNFT", {
         from: deployer,
-        args: ["https://api.pudgypenguins.io/lil/", "LilPudgys", "LP", 150000, lzEndpointAddress], // mainnet
-        // args: ["https://api.pudgypenguins.io/lil/", "LilPudgys", "LP", 100000, lzEndpointAddress], // testnet
+        args: ["", "DecaNFT", "DNFT", 150000, lzEndpointAddress], // mainnet
         log: true,
         waitConfirmations: 3,
         skipIfAlreadyDeployed: true
     })
 
-    let onft = await ethers.getContract("LilPudgysONFT")
+    let onft = await ethers.getContract("DecaNFT")
 
     let enabledChains = ["ethereum", "bsc", "arbitrum", "polygon"] // mainnet
     // let enabledChains = ["ethereum-goerli", "arbitrum-goerli"] // testnet
@@ -37,7 +36,7 @@ module.exports = async function ({ deployments, getNamedAccounts }) {
         }
     }
 
-    await hre.run("verifyContract", { contract: "LilPudgysONFT" })
+    await hre.run("verifyContract", { contract: "DecaNFT" })
 }
 
-module.exports.tags = ["LilPudgysONFT"]
+module.exports.tags = ["DecaNFT"]

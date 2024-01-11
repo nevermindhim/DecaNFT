@@ -150,5 +150,11 @@ module.exports = {
       chainId: 4002,
       accounts: accounts(),
     }
+  },
+  etherscan: {
+    apiKey: {
+        mainnet: "5KKUIPX5EDA1KX2RU7ZSAKYWMEJWPZQT4X",
+        "ethereum-goerli": "5KKUIPX5EDA1KX2RU7ZSAKYWMEJWPZQT4X"
+    }
   }
 };
