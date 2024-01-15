@@ -120,6 +120,11 @@ module.exports = {
       chainId: 5,
       accounts: accounts(),
     },
+    "ethereum-sepolia": {
+      url: "https://sepolia.infura.io/v3/7dc7a49d06b94cb1b98d960264e3c9ef", // public infura endpoint
+      chainId: 11155111,
+      accounts: accounts(),
+    },
     'bsc-testnet': {
       url: 'https://data-seed-prebsc-1-s1.binance.org:8545/',
       chainId: 97,
@@ -149,12 +154,16 @@ module.exports = {
       url: `https://rpc.ankr.com/fantom_testnet`,
       chainId: 4002,
       accounts: accounts(),
+    },
+    'manta-testnet': {
+      url: `	https://pacific-rpc.testnet.manta.network/http`,
+      chainId: 3441005,
+      accounts: accounts(),
     }
   },
   etherscan: {
     apiKey: {
-        mainnet: "5KKUIPX5EDA1KX2RU7ZSAKYWMEJWPZQT4X",
-        "ethereum-goerli": "5KKUIPX5EDA1KX2RU7ZSAKYWMEJWPZQT4X"
+        mainnet: "5KKUIPX5EDA1KX2RU7ZSAKYWMEJWPZQT4X"
     }
   }
 };

@@ -19,8 +19,8 @@ module.exports = async function ({ deployments, getNamedAccounts }) {
 
     let onft = await ethers.getContract("DecaNFT")
 
-    let enabledChains = ["ethereum", "bsc", "arbitrum", "polygon"] // mainnet
-    // let enabledChains = ["ethereum-goerli", "arbitrum-goerli"] // testnet
+    //let enabledChains = ["ethereum", "bsc", "arbitrum", "polygon"] // mainnet
+    let enabledChains = ["ethereum-goerli", "manta-testnet"] // testnet
 
     if (enabledChains.includes(hre.network.name)) {
         if (hre.network.name == "arbitrum" || hre.network.name == "arbitrum-goerli") {

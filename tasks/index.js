@@ -11,6 +11,7 @@ task(
 
 task("sendToken", "send an ONFT nftId from one chain to another", require("./sendToken"))
     .addParam("targetNetwork", "the chainId to transfer to")
+    .addParam("tokenId", "token to transfer")
 
 task("clearCredits", "clear credits", require("./clearCredits"))
 
@@ -18,3 +19,5 @@ task("verifyContract", "", require("./verifyContract.js"))
     .addParam("contract", "contract name")
 
 task("transferOwnership", "", require("./transferOwnership.js"))
+
+task("estimateGas", "estimateGas", require("./estimateGas"))
