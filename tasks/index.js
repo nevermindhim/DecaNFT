@@ -9,9 +9,15 @@ task(
     .addOptionalParam("remoteContract", "Name of remote contract if the names are different")
     .addOptionalParam("contract", "If both contracts are the same name")
 
-task("sendToken", "send an ONFT nftId from one chain to another", require("./sendToken"))
+task("decaNFTMint", "mint tokens", require("./decaNFTMint"))
+    .addParam("qty", "qty of tokens to mint")
+    .addParam("contract", "If both contracts are the same name")
+
+//
+task("decaNFTSend", "send an ONFT nftId from one chain to another", require("./decaNFTSend"))
+    .addParam("tokenId", "the tokenId of ONFT")
     .addParam("targetNetwork", "the chainId to transfer to")
-    .addParam("tokenId", "token to transfer")
+    .addParam("contract", "ONFT contract name")
 
 task("clearCredits", "clear credits", require("./clearCredits"))
 

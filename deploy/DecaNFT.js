@@ -11,7 +11,7 @@ module.exports = async function ({ deployments, getNamedAccounts }) {
 
     await deploy("DecaNFT", {
         from: deployer,
-        args: ["", "DecaNFT", "DNFT", 150000, lzEndpointAddress], // mainnet
+        args: ["", "DecaNFT", "DNFT", 10000000, lzEndpointAddress], // mainnet
         log: true,
         waitConfirmations: 3,
         skipIfAlreadyDeployed: true
@@ -29,9 +29,9 @@ module.exports = async function ({ deployments, getNamedAccounts }) {
 
         for (let n of enabledChains) {
             if (n != hre.network.name) {
-                await(await onft.setDstChainIdToTransferGas(CHAIN_IDS[n], 50000)).wait()
+                await(await onft.setDstChainIdToTransferGas(CHAIN_IDS[n], 10000000)).wait()
                 await(await onft.setDstChainIdToBatchLimit(CHAIN_IDS[n], 25)).wait()
-                await(await onft.setMinDstGas(CHAIN_IDS[n], 1, 150000)).wait()
+                await(await onft.setMinDstGas(CHAIN_IDS[n], 1, 10000000)).wait()
             }
         }
     }
