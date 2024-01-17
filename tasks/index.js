@@ -13,6 +13,9 @@ task("decaNFTMint", "mint tokens", require("./decaNFTMint"))
     .addParam("qty", "qty of tokens to mint")
     .addParam("contract", "If both contracts are the same name")
 
+task("sendToken", "send an ONFT nftId from one chain to another", require("./sendToken"))
+    .addParam("targetNetwork", "the chainId to transfer to")
+
 //
 task("decaNFTSend", "send an ONFT nftId from one chain to another", require("./decaNFTSend"))
     .addParam("tokenId", "the tokenId of ONFT")

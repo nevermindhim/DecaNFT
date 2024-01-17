@@ -3,7 +3,7 @@
 pragma solidity ^0.8.4;
 pragma abicoder v2;
 
-import "@layerzerolabs/solidity-examples/contracts/token/onft721/ONFT721A.sol";
+import "@layerzerolabs/solidity-examples/contracts/token/onft721/ONFT721.sol";
 import "@openzeppelin/contracts/token/common/ERC2981.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 
@@ -13,7 +13,7 @@ error InvalidMinter(address minter);
 error MintNotAvailable();
 error MintLimitExceeded();
 
-contract DecaNFT is ONFT721A, ERC2981 {
+contract DecaNFT is ONFT721, ERC2981 {
     using Strings for uint256;
 
     string public baseTokenURI;
@@ -24,6 +24,7 @@ contract DecaNFT is ONFT721A, ERC2981 {
     bool public mintState;
 
     uint256 public mintLimit;
+    uint256 public totalSupply;
     uint256 public constant MAX_ELEMENTS = 2024;
     uint256 public treasuryMintedCount = 0;
     uint256 private constant MAX_TREASURY_MINT_LIMIT = 100;
@@ -33,7 +34,7 @@ contract DecaNFT is ONFT721A, ERC2981 {
     // Permitted cashier minters
     mapping(address => bool) public minters;
 
-    constructor(string memory baseURI, string memory _name, string memory _symbol, uint256 _minGasToTransfer, address _lzEndpoint) ONFT721A(_name, _symbol, _minGasToTransfer, _lzEndpoint) {
+    constructor(string memory baseURI, string memory _name, string memory _symbol, uint256 _minGasToTransfer, address _lzEndpoint) ONFT721(_name, _symbol, _minGasToTransfer, _lzEndpoint) {
         setBaseURI(baseURI);
     }
 
@@ -102,27 +103,32 @@ contract DecaNFT is ONFT721A, ERC2981 {
         delete minters[minterAddress];
     }
 
-    modifier onlyMinters() {
-        if (whiteListingPeriod && !minters[msg.sender]) {
-            revert InvalidMinter(msg.sender);
+    modifier checkMintAvailability(address _addr) {
+        if (mintState == false) {
+            revert MintNotAvailable();
+        }
+        if (totalSupply >= MAX_ELEMENTS) {
+            revert ReachedMaxTotalSupply();
+        }
+        if (mintLimit != 0 && balanceOf(_addr) >= mintLimit) {
+            revert MintLimitExceeded();
+        }
+        if (whiteListingPeriod && !minters[_addr]) {
+            revert InvalidMinter(_addr);
         }
         _;
     }
 
-    function mint(uint256 quantity) external onlyMinters {
-        if (mintState == false) {
-            revert MintNotAvailable();
-        }
-        if (mintLimit != 0 && balanceOf(_msgSender()) + quantity > mintLimit) {
-            revert MintLimitExceeded();
-        }
-        if (totalSupply() + quantity > MAX_ELEMENTS)
-            revert ReachedMaxTotalSupply();
-        _safeMint(_msgSender(), quantity);
+    function mint(uint256 id) external  {
+        mint(msg.sender, id);
+    }
+    function mint(address _addr, uint256 id) internal checkMintAvailability(msg.sender) {
+        _safeMint(_addr, id);
+        totalSupply++;
     }
 
     function burn(uint256 tokenId) external {
-        _burn(tokenId, true);
+        _burn(tokenId);
     }
     
     // Set address for treasury wallet
@@ -130,38 +136,27 @@ contract DecaNFT is ONFT721A, ERC2981 {
         treasuryAddress = _treasuryAddress;
     }
     // Mint certain number of NFTs to a treasury wallet
-    function treasuryMint(uint256 quantity) external onlyOwner {
+    function treasuryMint(uint256 id) external onlyOwner {
         require(treasuryAddress != address(0), 'Treasury Address should be set up.');
-        _treasuryMint(quantity, treasuryAddress);
-    }
+        
+        if (treasuryMintedCount >= MAX_TREASURY_MINT_LIMIT)
+            revert ReachedMaxTreasurySupply();
 
-    function _treasuryMint(uint256 quantity, address receiver) internal {
-        if (treasuryMintedCount + quantity > MAX_TREASURY_MINT_LIMIT)
-        revert ReachedMaxTreasurySupply();
-
-        if (totalSupply() + quantity > MAX_ELEMENTS)
-        revert ReachedMaxTotalSupply();
-
-        uint256 indexBeforeMint = _nextTokenId();
-
-        _safeMint(receiver, quantity);
-
-        treasuryMintedCount += quantity;
-
-        emit TreasuryMint(receiver, quantity, indexBeforeMint);
+        mint(treasuryAddress, id);
+        treasuryMintedCount++;
     }
 
     // ERC2981 Royalty START
     function supportsInterface(
         bytes4 interfaceId
-    ) public view virtual override(ONFT721A, ERC2981) returns (bool) {
+    ) public view virtual override(ONFT721, ERC2981) returns (bool) {
         // Supports the following `interfaceId`s:
         // - IERC165: 0x01ffc9a7
         // - IERC721: 0x80ac58cd
         // - IERC721Metadata: 0x5b5e139f
         // - IERC2981: 0x2a55205a
         return
-        ERC721A.supportsInterface(interfaceId) ||
+        ERC721.supportsInterface(interfaceId) ||
         ERC2981.supportsInterface(interfaceId);
     }
 
