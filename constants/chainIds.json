@@ -8,6 +8,7 @@
   "fantom":           112,
 
   "ethereum-goerli":  10121,
+  "ethereum-sepolia":  10161,
   "bsc-testnet":      10102,
   "fuji":             10106,
   "mumbai":           10109,

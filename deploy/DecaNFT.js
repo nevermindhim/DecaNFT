@@ -11,16 +11,16 @@ module.exports = async function ({ deployments, getNamedAccounts }) {
 
     await deploy("DecaNFT", {
         from: deployer,
-        args: ["", "DecaNFT", "DNFT", 150000, lzEndpointAddress], // mainnet
+        args: ["", "DecaNFT", "DNFT", 2024, lzEndpointAddress], // mainnet
         log: true,
         waitConfirmations: 3,
         skipIfAlreadyDeployed: true
     })
-
+/*
     let onft = await ethers.getContract("DecaNFT")
 
     //let enabledChains = ["ethereum", "bsc", "arbitrum", "polygon"] // mainnet
-    let enabledChains = ["ethereum-goerli", "manta-testnet"] // testnet
+    let enabledChains = ["ethereum-goerli", "ethereum-sepolia"] // testnet
 
     if (enabledChains.includes(hre.network.name)) {
         if (hre.network.name == "arbitrum" || hre.network.name == "arbitrum-goerli") {
@@ -29,13 +29,12 @@ module.exports = async function ({ deployments, getNamedAccounts }) {
 
         for (let n of enabledChains) {
             if (n != hre.network.name) {
-                await(await onft.setDstChainIdToTransferGas(CHAIN_IDS[n], 50000)).wait()
-                await(await onft.setDstChainIdToBatchLimit(CHAIN_IDS[n], 25)).wait()
-                await(await onft.setMinDstGas(CHAIN_IDS[n], 1, 150000)).wait()
+                //await(await onft.setDstChainIdToTransferGas(CHAIN_IDS[n], 100000)).wait()
+                await(await onft.setMinDstGas(CHAIN_IDS[n], 1, 100000)).wait()
             }
         }
     }
-
+*/
     await hre.run("verifyContract", { contract: "DecaNFT" })
 }
 
