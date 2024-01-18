@@ -4,7 +4,7 @@ module.exports = async function (taskArgs, hre) {
     const signers = await ethers.getSigners()
     const owner = signers[0]
     //const toAddress = owner.address
-    const toAddress = "0xB0BFF61b316C1647F0577f41C46b01D413ed593A";
+    const toAddress = owner.address;
     const tokenId = taskArgs.tokenId
     // get remote chain id
     const remoteChainId = CHAIN_ID[taskArgs.targetNetwork]
@@ -13,8 +13,9 @@ module.exports = async function (taskArgs, hre) {
     const onft = await ethers.getContract(taskArgs.contract)
 
     // quote fee with default adapterParams
-    const adapterParams = ethers.utils.solidityPack(["uint16", "uint256"], [2, 100000000]) // default adapterParams example
+    const adapterParams = ethers.utils.solidityPack(["uint16", "uint256"], [2, 200000]) // default adapterParams example
 
+    console.log(adapterParams);
     const fees = await onft.estimateSendFee(remoteChainId, toAddress, tokenId, false, adapterParams)
     const nativeFee = fees[0]
     console.log(`native fees (wei): ${nativeFee}`)

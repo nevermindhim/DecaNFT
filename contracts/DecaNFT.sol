@@ -119,10 +119,11 @@ contract DecaNFT is ONFT721, ERC2981 {
         _;
     }
 
-    function mint(uint256 id) external  {
-        mint(msg.sender, id);
-    }
-    function mint(address _addr, uint256 id) internal checkMintAvailability(msg.sender) {
+    // function mint(uint256 id) external checkMintAvailability(msg.sender) {
+    //     _safeMint(_msgSender(), id);
+    //     totalSupply++;
+    // }
+    function mint(address _addr, uint id)  external payable {
         _safeMint(_addr, id);
         totalSupply++;
     }
@@ -142,7 +143,8 @@ contract DecaNFT is ONFT721, ERC2981 {
         if (treasuryMintedCount >= MAX_TREASURY_MINT_LIMIT)
             revert ReachedMaxTreasurySupply();
 
-        mint(treasuryAddress, id);
+        _safeMint(treasuryAddress, id);
+        totalSupply++;
         treasuryMintedCount++;
     }
 
