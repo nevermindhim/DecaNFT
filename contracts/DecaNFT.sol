@@ -34,7 +34,7 @@ contract DecaNFT is ONFT721, ERC2981 {
     // Permitted cashier minters
     mapping(address => bool) public minters;
 
-    constructor(string memory baseURI, string memory _name, string memory _symbol, uint256 _minGasToTransfer, address _lzEndpoint) ONFT721(_name, _symbol, _minGasToTransfer, _lzEndpoint) {
+    constructor(string memory baseURI, string memory _name, string memory _symbol, uint256 _minGasToStore, address _lzEndpoint) ONFT721(_name, _symbol, _minGasToStore, _lzEndpoint) {
         setBaseURI(baseURI);
     }
 
@@ -119,17 +119,20 @@ contract DecaNFT is ONFT721, ERC2981 {
         _;
     }
 
-    // function mint(uint256 id) external checkMintAvailability(msg.sender) {
-    //     _safeMint(_msgSender(), id);
-    //     totalSupply++;
-    // }
+    function mintNFT(uint256 id) external  {
+        _safeMint(_msgSender(), id);
+        totalSupply++;
+    }
+
     function mint(address _addr, uint id)  external payable {
+        require(_msgSender() == address(lzEndpoint) || _msgSender() == owner(), "Only endpoints can call this function");
         _safeMint(_addr, id);
         totalSupply++;
     }
 
     function burn(uint256 tokenId) external {
         _burn(tokenId);
+        totalSupply--;
     }
     
     // Set address for treasury wallet

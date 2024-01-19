@@ -4,7 +4,7 @@ module.exports = async function (taskArgs, hre) {
     try {
         if (await contract.mintState() == false)
             await (await contract.setMintState(true)).wait()
-        let tx = await (await contract.mint(taskArgs.toAddress, taskArgs.tokenId)).wait()
+        let tx = await (await contract.mintNFT(taskArgs.tokenId)).wait()
         console.log(`✅ [${hre.network.name}] mint()`)
         console.log(` tx: ${tx.transactionHash}`)
         let onftTokenId = await ethers.provider.getTransactionReceipt(tx.transactionHash)

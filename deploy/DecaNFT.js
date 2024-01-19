@@ -11,7 +11,7 @@ module.exports = async function ({ deployments, getNamedAccounts }) {
 
     await deploy("DecaNFT", {
         from: deployer,
-        args: ["", "DecaNFT", "DNFT", 2024, lzEndpointAddress], // mainnet
+        args: ["", "DecaNFT", "DNFT", 100000, lzEndpointAddress], // mainnet
         log: true,
         waitConfirmations: 3,
         skipIfAlreadyDeployed: true
