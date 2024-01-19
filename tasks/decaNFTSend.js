@@ -13,7 +13,7 @@ module.exports = async function (taskArgs, hre) {
     const onft = await ethers.getContract(taskArgs.contract)
 
     // quote fee with default adapterParams
-    const adapterParams = ethers.utils.solidityPack(["uint16", "uint256"], [2, 200000]) // default adapterParams example
+    const adapterParams = ethers.utils.solidityPack(["uint16", "uint256"], [1, 200000]) // default adapterParams example
 
     console.log(adapterParams);
     const fees = await onft.estimateSendFee(remoteChainId, toAddress, tokenId, false, adapterParams)
