@@ -126,6 +126,9 @@ contract DecaNFT is ONFT721, ERC2981, Pausable, Whitelist {
         }
         totalSupply += _quantity;
         emit Mint(_sender, _quantity, supply);
+
+        (bool success, ) = payable(treasuryAddress).call{value: msg.value}("");
+        require(success);
     }
 
     // Mint function used for cross-chain communication
