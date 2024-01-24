@@ -1,5 +1,7 @@
 const { ethers } = require("hardhat");
 const { expect } = require("chai");
+const { MerkleTree } = require('merkletreejs');
+const { keccak256 } = ethers.utils;
 
 describe("DecaNFT", function () {
   let DecaNFT;
@@ -13,66 +15,66 @@ describe("DecaNFT", function () {
 
     // Deploy the DecaNFT contract
     DecaNFT = await ethers.getContractFactory("DecaNFT");
-    decaNFT = await DecaNFT.deploy("", "DecaNFT", "DNFT", 100000, addr1.address);
+    decaNFT = await DecaNFT.deploy("", "DecaNFT", "DNFT", 100000, ethers.constants.AddressZero);
     await decaNFT.deployed();
-    if (this.currentTest.title !== 'Should have an error minting new tokens') {
-      await decaNFT.setMintState(true);
-    }
   });
 
   describe("Mint test", function () {
     it("Should have an error minting new tokens", async function () {
-      await expect(decaNFT.mintNFT(2)).to.be.revertedWith("MintNotAvailable");
+      await decaNFT.setMintState(false);
+      
+      await expect(decaNFT.mintNFT(2, [])).to.be.revertedWith("Mint is not available.");
     });
   
     it("Should mint new tokens", async function () {
-      await decaNFT.mintNFT(0);
-      await decaNFT.mintNFT(1);
+      await decaNFT.mintNFT(2, []);
   
       expect(await decaNFT.totalSupply()).to.equal(2);
-      expect(await decaNFT.ownerOf(0)).to.equal(owner.address);
       expect(await decaNFT.ownerOf(1)).to.equal(owner.address);
+      expect(await decaNFT.ownerOf(2)).to.equal(owner.address);
       expect(await decaNFT.balanceOf(owner.address)).to.equal(2);
     });
   
     it("Should have an mint limit error", async function () {
       await decaNFT.setMintLimit(5);
-      
-      await decaNFT.mintNFT(0);
-      await decaNFT.mintNFT(1);
-      await decaNFT.mintNFT(2);
-      await decaNFT.mintNFT(3);
-      await decaNFT.mintNFT(4);
 
-      await expect(decaNFT.mintNFT(5)).to.be.revertedWith("MintLimitExceeded");
+      await expect(decaNFT.mintNFT(6, [])).to.be.revertedWith("Mint limit exceeded.");
     });
 
     describe("Whitelisting test", async function () {
+      let whitelist, proof = [], merkleTree;
       beforeEach(async function () {
-        await decaNFT.enableWhiteListing(true);
-        await decaNFT.addToWhiteList(addr1.address);
-      });
+        whitelist = [
+          '0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC',
+          '0x90F79bf6EB2c4f870365E785982E1f101E93b906',
+          '0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65',
+          '0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc',
+          '0x976EA74026E726554dB657fA54763abd0C3a0aa9',
+        ];
 
+        await decaNFT.enableWhiteListing(true);
+
+      });
+      
       it("Should mint new tokens", async function () {
-        await decaNFT.connect(addr1).mintNFT(0);
-        await decaNFT.connect(addr1).mintNFT(1);
+        whitelist.push(addr1.address);
+        let leaves = whitelist.map((addr) => keccak256(addr));
+        merkleTree = new MerkleTree(leaves, keccak256, { sortPairs: true });
+        const merkleRootHash = await merkleTree.getHexRoot()
+        decaNFT.setMerkleRoot(merkleRootHash);
+      
+        let hashedAddress = keccak256(addr1.address)
+        proof = merkleTree.getHexProof(hashedAddress)
+        await decaNFT.connect(addr1).mintNFT(2, proof);
     
         expect(await decaNFT.whiteListingPeriod()).to.equal(true);
-        expect(await decaNFT.minters(addr1.address)).to.equal(true);
-        expect(await decaNFT.ownerOf(0)).to.equal(addr1.address);
         expect(await decaNFT.ownerOf(1)).to.equal(addr1.address);
+        expect(await decaNFT.ownerOf(2)).to.equal(addr1.address);
         expect(await decaNFT.balanceOf(addr1.address)).to.equal(2);
       });
 
       it("Should fail with whitelist error", async function () {
-        await expect(decaNFT.connect(addr2).mintNFT(0)).to.be.revertedWith("InvalidMinter");
-      });
-
-      it("Should be removed from whitelist and fail minting", async function () {
-        await decaNFT.removeFromWhiteList(addr1.address);
-
-        expect(await decaNFT.minters(addr1.address)).to.equal(false);
-        await expect(decaNFT.connect(addr1).mintNFT(0)).to.be.revertedWith("InvalidMinter");
+        await expect(decaNFT.connect(addr2).mintNFT(1, [])).to.be.revertedWith("Invalid minter.");
       });
     });
   });
@@ -80,7 +82,7 @@ describe("DecaNFT", function () {
   describe("Token URI test", function () {
     it("Should show prereveal token URI", async function() {
       await decaNFT.setPrerevealTokenURI("PrerevealURI");
-      await decaNFT.mintNFT(1);
+      await decaNFT.mintNFT(1, []);
 
       expect(await decaNFT.tokenURI(1)).to.equal("PrerevealURI");
     });
@@ -88,11 +90,10 @@ describe("DecaNFT", function () {
     it("Should show individual token URI", async function () {
       await decaNFT.setBaseURI("BaseURI");
       await decaNFT.setRevealed(true);
-      await decaNFT.mintNFT(0);
-      await decaNFT.mintNFT(1);
+      await decaNFT.mintNFT(2, []);
 
-      expect(await decaNFT.tokenURI(0)).to.equal("BaseURI/0");
-      expect(await decaNFT.tokenURI(1)).to.equal("BaseURI/1");
+      expect(await decaNFT.tokenURI(1)).to.equal("BaseURI1");
+      expect(await decaNFT.tokenURI(2)).to.equal("BaseURI2");
     });  
   });
   describe("Treasury mint test", async function () {
@@ -104,9 +105,10 @@ describe("DecaNFT", function () {
 
     it("Should mint to treasury address", async function () {
       await decaNFT.setTreasuryAddress(addr1.address);
-      await decaNFT.treasuryMint(0);
+      await decaNFT.treasuryMint(2);
 
-      expect(await decaNFT.ownerOf(0)).to.equal(addr1.address);
+      expect(await decaNFT.ownerOf(1)).to.equal(addr1.address);
+      expect(await decaNFT.ownerOf(2)).to.equal(addr1.address);
     });
   });
 });
