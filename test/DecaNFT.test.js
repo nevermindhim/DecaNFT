@@ -27,12 +27,18 @@ describe("DecaNFT", function () {
     });
   
     it("Should mint new tokens", async function () {
-      await decaNFT.mintNFT(2, []);
-  
+      await decaNFT.setMintPrice(ethers.utils.parseEther("0.0003"));
+      expect(await decaNFT.connect(addr1).mintNFT(2, [], { value: ethers.utils.parseEther("0.0006") }))
+      
       expect(await decaNFT.totalSupply()).to.equal(2);
-      expect(await decaNFT.ownerOf(1)).to.equal(owner.address);
-      expect(await decaNFT.ownerOf(2)).to.equal(owner.address);
-      expect(await decaNFT.balanceOf(owner.address)).to.equal(2);
+      expect(await decaNFT.ownerOf(1)).to.equal(addr1.address);
+      expect(await decaNFT.ownerOf(2)).to.equal(addr1.address);
+      expect(await decaNFT.balanceOf(addr1.address)).to.equal(2);
+    });
+
+    it("Should fail with mint price error", async function () {
+      await decaNFT.setMintPrice(ethers.utils.parseEther("0.0003"));
+      await expect(decaNFT.connect(addr1).mintNFT(2, [], { value: ethers.utils.parseEther("0.0005") })).to.be.revertedWith("Must send required eth to mint.");
     });
   
     it("Should have an mint limit error", async function () {
@@ -109,6 +115,8 @@ describe("DecaNFT", function () {
 
       expect(await decaNFT.ownerOf(1)).to.equal(addr1.address);
       expect(await decaNFT.ownerOf(2)).to.equal(addr1.address);
+
+      expect(await decaNFT.treasuryMintedCount()).to.equal(2);
     });
   });
 });

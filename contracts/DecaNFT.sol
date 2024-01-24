@@ -105,13 +105,13 @@ contract DecaNFT is ONFT721, ERC2981, Pausable, Whitelist {
         whiteListingPeriod = _whiteListingPeriod;
     }
 
-    // @dev
+    // Users can mint NFTs calling this function
     // Mint multiple NFTs at once with merkle proof
     // Merkle proof can be unnecessary if not whitelisting period.
     function mintNFT(uint256 _quantity, bytes32[] memory proof) public payable whenNotPaused() {
         uint256 supply = totalSupply;
         address _sender = msg.sender;
-        require(msg.sender == owner() || msg.value >= mintPrice * _quantity);
+        require(msg.sender == owner() || msg.value >= mintPrice * _quantity, "Must send required eth to mint.");
         require(_quantity > 0, "Quantity cannot be zero.");
         require(mintState, "Mint is not available.");
         require(supply + _quantity <= MAX_ELEMENTS, "Reached max total supply.");
@@ -127,6 +127,9 @@ contract DecaNFT is ONFT721, ERC2981, Pausable, Whitelist {
         totalSupply += _quantity;
         emit Mint(_sender, _quantity, supply);
     }
+
+    // Mint function used for cross-chain communication
+    // Only owner or layerzero endpoints can call this function
     function mint(address _addr, uint id)  external payable {
         require(_msgSender() == address(lzEndpoint) || _msgSender() == owner(), "Only owner and endpoints can call this function");
         _safeMint(_addr, id);
@@ -152,7 +155,7 @@ contract DecaNFT is ONFT721, ERC2981, Pausable, Whitelist {
         }
         totalSupply += _quantity;
         emit Mint(treasuryAddress, _quantity, supply);
-        treasuryMintedCount++;
+        treasuryMintedCount += _quantity;
     }
 
     // ERC2981 Royalty START
