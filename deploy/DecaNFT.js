@@ -4,17 +4,6 @@ const { ethers, upgrades } = require("hardhat");
 require('@openzeppelin/hardhat-upgrades');
 
 module.exports = async function ({ deployments, getNamedAccounts }) {
-    // const { deploy } = deployments
-    // const { deployer } = await getNamedAccounts()
-    // console.log(`>>> your address: ${deployer}`)
-
-    // await deployProxyImpl("DecaNFT", {
-    //     from: deployer,
-    //     args: ["", "DecaNFT", "DNFT"], // mainnet
-    //     log: true,
-    //     waitConfirmations: 3,
-    //     skipIfAlreadyDeployed: true
-    // })
     const Dnft = await ethers.getContractFactory("DecaNFT");
     const dnft = await upgrades.deployProxy(Dnft, ["", "DecaNFT", "DNFT"]);
     await dnft.deployed();

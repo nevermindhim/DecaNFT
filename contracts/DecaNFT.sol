@@ -49,10 +49,6 @@ contract DecaNFT is ERC721Upgradeable, OwnableUpgradeable, UUPSUpgradeable, ERC2
         bool state
     );
 
-    constructor() {
-        _disableInitializers();
-    }
-
     function initialize(string memory baseURI, string memory _name, string memory _symbol) public initializer {
         __ERC721_init(_name, _symbol);
         __Ownable_init();
