@@ -1,10 +1,10 @@
 //SPDX-License-Identifier: Unlicense
 pragma solidity ^0.8.4;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 
-contract Whitelist is Ownable {
+contract Whitelist is OwnableUpgradeable {
     bytes32 private merkleRoot;
 
     function setMerkleRoot(bytes32 newRoot) public onlyOwner() returns (bytes32) {

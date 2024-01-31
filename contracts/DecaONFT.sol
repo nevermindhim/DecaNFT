@@ -3,36 +3,40 @@
 pragma solidity ^0.8.4;
 pragma abicoder v2;
 
-import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/token/common/ERC2981Upgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+import "@layerzerolabs/solidity-examples/contracts/token/onft721/ONFT721.sol";
 import "@openzeppelin/contracts/token/common/ERC2981.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
+import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
-import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
-contract DecaNFT is ERC721Upgradeable, OwnableUpgradeable, UUPSUpgradeable, ERC2981Upgradeable {
+contract DecaONFT is ONFT721, ERC2981, Pausable {
     using Strings for uint256;
-
-    address public treasuryAddress;
-    bytes32 private merkleRoot;
 
     string public baseTokenURI;
     string public prerevealTokenURI;
+    bytes32 private merkleRoot;
 
     bool public revealed;
-    bool public paused;
     bool public whiteListingPeriod;
-    bool public mintState;
+    bool public mintState = true;
+
 
     uint256 public startTokenId;
     uint256 public mintLimit;
     uint256 public mintPrice;
     uint256 public totalSupply;
     uint256 public constant MAX_ELEMENTS = 2024;
-    uint256 public treasuryMintedCount;
+    uint256 public treasuryMintedCount = 0;
     uint256 private constant MAX_TREASURY_MINT_LIMIT = 100;
+
+    address public treasuryAddress;
+
+    // Permitted cashier whitelisted
+    // mapping(address => bool) public whitelisted;
+
+    constructor(string memory baseURI, string memory _name, string memory _symbol, uint256 _minGasToStore, address _lzEndpoint) ONFT721(_name, _symbol, _minGasToStore, _lzEndpoint) {
+        setBaseURI(baseURI);
+    }
 
     event TreasuryMint(
         address indexed recipient,
@@ -48,20 +52,6 @@ contract DecaNFT is ERC721Upgradeable, OwnableUpgradeable, UUPSUpgradeable, ERC2
     event MintStateChanged(
         bool state
     );
-
-    constructor() {
-        _disableInitializers();
-    }
-
-    function initialize(string memory baseURI, string memory _name, string memory _symbol) public initializer {
-        __ERC721_init(_name, _symbol);
-        __Ownable_init();
-        __UUPSUpgradeable_init();
-        setBaseURI(baseURI);
-    }
-
-    function _authorizeUpgrade(address) internal override onlyOwner{
-    }
 
     //Base URI for all tokens
     function setBaseURI(string memory baseURI) public onlyOwner {
@@ -118,13 +108,12 @@ contract DecaNFT is ERC721Upgradeable, OwnableUpgradeable, UUPSUpgradeable, ERC2
     // Users can mint NFTs calling this function
     // Mint multiple NFTs at once with merkle proof
     // Merkle proof can be unnecessary if not whitelisting period.
-    function mintNFT(uint256 _quantity, bytes32[] memory proof) public payable {
+    function mintNFT(uint256 _quantity, bytes32[] memory proof) public payable whenNotPaused() {
         uint256 supply = totalSupply;
         address _sender = msg.sender;
         require(msg.sender == owner() || msg.value >= mintPrice * _quantity, "Must send required eth to mint.");
         require(_quantity > 0, "Quantity cannot be zero.");
         require(mintState, "Mint is not available.");
-        require(!paused, "Contract is paused.");
         require(supply + _quantity <= MAX_ELEMENTS, "Reached max total supply.");
         require(mintLimit == 0 || _quantity <= mintLimit, "Mint limit exceeded.");
 
@@ -140,6 +129,14 @@ contract DecaNFT is ERC721Upgradeable, OwnableUpgradeable, UUPSUpgradeable, ERC2
 
         (bool success, ) = payable(treasuryAddress).call{value: msg.value}("");
         require(success);
+    }
+
+    // Mint function used for cross-chain communication
+    // Only owner or layerzero endpoints can call this function
+    function mint(address _addr, uint id)  external payable {
+        require(_msgSender() == address(lzEndpoint) || _msgSender() == owner(), "Only owner and endpoints can call this function");
+        _safeMint(_addr, id);
+        totalSupply++;
     }
 
     // Set address for treasury wallet
@@ -167,15 +164,15 @@ contract DecaNFT is ERC721Upgradeable, OwnableUpgradeable, UUPSUpgradeable, ERC2
     // ERC2981 Royalty START
     function supportsInterface(
         bytes4 interfaceId
-    ) public view virtual override(ERC721Upgradeable, ERC2981Upgradeable) returns (bool) {
+    ) public view virtual override(ONFT721, ERC2981) returns (bool) {
         // Supports the following `interfaceId`s:
         // - IERC165: 0x01ffc9a7
         // - IERC721: 0x80ac58cd
         // - IERC721Metadata: 0x5b5e139f
         // - IERC2981: 0x2a55205a
         return
-        ERC721Upgradeable.supportsInterface(interfaceId) ||
-        ERC2981Upgradeable.supportsInterface(interfaceId);
+        ERC721.supportsInterface(interfaceId) ||
+        ERC2981.supportsInterface(interfaceId);
     }
 
     //Sets default royalty percent and address
@@ -208,14 +205,14 @@ contract DecaNFT is ERC721Upgradeable, OwnableUpgradeable, UUPSUpgradeable, ERC2
         return tokensId;
     }
 
-    function pause() external onlyOwner{
-        paused = true;
+    function pause() external onlyOwner whenNotPaused() {
+        _pause();
     }
     
-    function unpause() external onlyOwner{
-        paused = false;
+    function unpause() external onlyOwner whenPaused() {
+        _unpause();
     }
-    
+
     function setMerkleRoot(bytes32 newRoot) public onlyOwner() returns (bytes32) {
         merkleRoot = newRoot;
         return merkleRoot;

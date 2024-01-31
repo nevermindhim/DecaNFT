@@ -121,7 +121,7 @@ module.exports = {
       accounts: accounts(),
     },
     "ethereum-sepolia": {
-      url: "https://sepolia.infura.io/v3/7dc7a49d06b94cb1b98d960264e3c9ef", // public infura endpoint
+      url: "https://eth-sepolia.g.alchemy.com/v2/r24vXvM3fi53zBdclFRC79MOyMx7w5k-", // public infura endpoint
       chainId: 11155111,
       accounts: accounts(),
     },
@@ -163,7 +163,8 @@ module.exports = {
   },
   etherscan: {
     apiKey: {
-        mainnet: "5KKUIPX5EDA1KX2RU7ZSAKYWMEJWPZQT4X"
+        mainnet: "5KKUIPX5EDA1KX2RU7ZSAKYWMEJWPZQT4X",
+        sepolia: "5KKUIPX5EDA1KX2RU7ZSAKYWMEJWPZQT4X"
     }
   }
 };

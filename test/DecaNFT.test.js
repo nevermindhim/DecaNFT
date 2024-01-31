@@ -1,4 +1,4 @@
-const { ethers } = require("hardhat");
+const { ethers, upgrades } = require("hardhat");
 const { expect } = require("chai");
 const { MerkleTree } = require('merkletreejs');
 const { keccak256 } = ethers.utils;
@@ -15,8 +15,11 @@ describe("DecaNFT", function () {
 
     // Deploy the DecaNFT contract
     DecaNFT = await ethers.getContractFactory("DecaNFT");
-    decaNFT = await DecaNFT.deploy("", "DecaNFT", "DNFT", 100000, ethers.constants.AddressZero);
+    //decaNFT = await DecaNFT.deploy("", "DecaNFT", "DNFT", 100000, ethers.constants.AddressZero);
+    //await decaNFT.deployed();
+    decaNFT = await upgrades.deployProxy(DecaNFT, ["", "DecaNFT", "DNFT"]);
     await decaNFT.deployed();
+    await decaNFT.setMintState(true);
   });
 
   describe("Mint test", function () {

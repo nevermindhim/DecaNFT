@@ -1,8 +1,8 @@
 const { expect } = require("chai");
-const { ethers } = require("hardhat");
+const { ethers, upgrades } = require("hardhat");
 const { getAmountInWei, getAmountFromWei, moveTime } = require('../utils/helper-scripts');
 
-describe("NFTStake.sol", () => {
+describe("NFTStake", () => {
     let owner;
     let stakingVault;
     let nftContract;
@@ -16,7 +16,9 @@ describe("NFTStake.sol", () => {
 
         // Deploy DecaNFT NFT contract 
         const NFTContract = await ethers.getContractFactory("DecaNFT");
-        nftContract = await NFTContract.deploy("", "DecaNFT", "DNFT", 100000, ethers.constants.AddressZero);
+        //nftContract = await NFTContract.deploy("", "DecaNFT", "DNFT", 100000, ethers.constants.AddressZero);
+        nftContract = await upgrades.deployProxy(NFTContract, ["", "DecaNFT", "DNFT"]);
+        await nftContract.setMintState(true);
 
         // Deploy DecaNFT ERC20 token contract 
         const TokenContract = await ethers.getContractFactory("DecaFT");
@@ -166,7 +168,7 @@ describe("NFTStake.sol", () => {
 
         it("should not allow user to mint NFT while contract is paused", async () => {
             await nftContract.connect(owner).pause()
-            await expect(nftContract.connect(user1).mintNFT(3, [])).to.be.revertedWith("Pausable: paused")
+            await expect(nftContract.connect(user1).mintNFT(3, [])).to.be.revertedWith("Contract is paused")
         });
 
         it("should not allow not NFT owner to stake his nfts", async () => {
