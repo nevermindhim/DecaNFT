@@ -20,6 +20,9 @@ module.exports = async function (taskArgs, hre) {
     const nativeFee = fees[0]
     console.log(`native fees (wei): ${nativeFee}`)
 
+    console.log(nativeFee);
+    console.log(`Adapter: ${adapterParams}`);
+
     const tx = await onft.sendFrom(
         owner.address, // 'from' address to send tokens
         remoteChainId, // remote LayerZero chainId

@@ -11,16 +11,17 @@ module.exports = async function ({ deployments, getNamedAccounts }) {
     console.log(`[${hre.network.name}] Endpoint Address: ${lzEndpointAddress}`)
 
     // get the Endpoint address
+    const _name = "SpheraHead";
+    const _symbol = "SPH";
     const _maxSupply = 3000;
-    const _withdrawAddress = "0x43b1DB0EC2167C8811cA0216A35B3bEfc339689c";
-    await deploy("SpheraKitBag", {
+    await deploy("SpheraHead", {
         from: deployer,
-        args: [_maxSupply, _withdrawAddress, 200000, lzEndpointAddress],
+        args: [_name, _symbol, _maxSupply, 100000, lzEndpointAddress],
         log: true,
         waitConfirmations: 3,
         skipIfAlreadyDeployed: true
     })
-    await hre.run("verifyContract", { contract: "SpheraKitBag" })
+    await hre.run("verifyContract", { contract: "SpheraHead" })
 }
 
-module.exports.tags = ["SpheraKitBag"]
+module.exports.tags = ["SpheraHead"]
