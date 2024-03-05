@@ -17,6 +17,7 @@ describe("SpheraKitBag", function () {
     '0x976EA74026E726554dB657fA54763abd0C3a0aa9',
   ];
   let proof = [], merkleTree;
+  let merkleRootHash;
 
   beforeEach(async function () {
     [owner, addr1, addr2] = await ethers.getSigners();
@@ -30,12 +31,11 @@ describe("SpheraKitBag", function () {
     whitelist.push(addr1.address);
     let leaves = whitelist.map((addr) => keccak256(addr));
     merkleTree = new MerkleTree(leaves, keccak256, { sortPairs: true });
-    const merkleRootHash = await merkleTree.getHexRoot()
+    merkleRootHash = await merkleTree.getHexRoot()
     spheraKitBag.setGtdMerkleRoot(merkleRootHash);
 
     let hashedAddress = keccak256(owner.address)
     proof = merkleTree.getHexProof(hashedAddress)
-
     
     let hashedAddress1 = keccak256(addr1.address)
     proofaddr1 = merkleTree.getHexProof(hashedAddress1)
@@ -81,8 +81,11 @@ describe("SpheraKitBag", function () {
       await spheraKitBag.setPeriodParams(1, Math.floor(Date.now() /  1000) -  60 *  60, Math.floor(Date.now() /  1000) +  60 *  60,  1000000000000000,  10,  100);
       // Mint tokens in the open period
      
-      await spheraKitBag.periodMint(1,  1, proof, { value: ethers.utils.parseEther("0.05") });
-      expect(await spheraKitBag.totalMintedInPeriod(1)).to.equal(1);
+      let txResp = await spheraKitBag.periodMint(1,  3, proof, { value: ethers.utils.parseEther("0.05") });
+      let txReceipt = await txResp.wait();
+      let gasUsed = ethers.BigNumber.from(txReceipt.gasUsed);
+      console.log(merkleRootHash, proof, gasUsed.toString());
+      expect(await spheraKitBag.totalMintedInPeriod(1)).to.equal(3);
     });
 
     it("should revert if trying to mint in a period that has not been set up", async function () {
