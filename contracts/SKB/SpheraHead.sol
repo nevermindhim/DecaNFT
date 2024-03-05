@@ -271,13 +271,13 @@ contract SpheraHead is ERC2981, ONFT721, MultisigOwnable, OperatorFilterer {
     ) external onlyOwner {
         _setTokenRoyalty(tokenId, receiver, feeNumerator);
     }
-/*
+
     // ---------------------------------------------------
     // OperatorFilterer overrides (overrides, values etc.)
     // ---------------------------------------------------
     function setApprovalForAll(address operator, bool approved)
         public
-        override
+        override(ERC721, IERC721)
         onlyAllowedOperatorApproval(operator)
     {
         super.setApprovalForAll(operator, approved);
@@ -293,7 +293,7 @@ contract SpheraHead is ERC2981, ONFT721, MultisigOwnable, OperatorFilterer {
 
     function approve(address operator, uint256 tokenId)
         public
-        override
+        override(ERC721, IERC721)
         onlyAllowedOperatorApproval(operator)
     {
         super.approve(operator, tokenId);
@@ -308,7 +308,7 @@ contract SpheraHead is ERC2981, ONFT721, MultisigOwnable, OperatorFilterer {
         address from,
         address to,
         uint256 id
-    ) public override onlyAllowedOperator(from) {
+    ) public override(ERC721, IERC721) onlyAllowedOperator(from) {
         if (!_isValidAgainstRegistry(msg.sender)) {
             revert NotAllowedByRegistry();
         }
@@ -335,7 +335,6 @@ contract SpheraHead is ERC2981, ONFT721, MultisigOwnable, OperatorFilterer {
     function setRegistryAddress(address _registryAddress) external onlyOwner {
         registryAddress = _registryAddress;
     }
-*/
     // -------
     // EIP-165
     // -------
