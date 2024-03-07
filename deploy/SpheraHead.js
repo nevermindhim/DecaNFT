@@ -1,5 +1,5 @@
-const LZ_ENDPOINTS = require("../../constants/layerzeroEndpoints.json")
-const CHAIN_IDS = require("../../constants/chainIds.json");
+const LZ_ENDPOINTS = require("../constants/layerzeroEndpoints.json")
+const CHAIN_IDS = require("../constants/chainIds.json");
 
 module.exports = async function ({ deployments, getNamedAccounts }) {
     const { deploy } = deployments
