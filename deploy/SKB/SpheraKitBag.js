@@ -15,10 +15,10 @@ module.exports = async function ({ deployments, getNamedAccounts }) {
     const _withdrawAddress = "0x43b1DB0EC2167C8811cA0216A35B3bEfc339689c";
     await deploy("SpheraKitBag", {
         from: deployer,
-        args: [_maxSupply, _withdrawAddress, 200000, lzEndpointAddress],
+        args: [_maxSupply, _withdrawAddress, 100000, lzEndpointAddress],
         log: true,
         waitConfirmations: 3,
-        skipIfAlreadyDeployed: true
+        //skipIfAlreadyDeployed: true
     })
     await hre.run("verifyContract", { contract: "SpheraKitBag" })
 }

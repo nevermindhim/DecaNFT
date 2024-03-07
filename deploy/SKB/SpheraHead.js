@@ -19,7 +19,7 @@ module.exports = async function ({ deployments, getNamedAccounts }) {
         args: [_name, _symbol, _maxSupply, 100000, lzEndpointAddress],
         log: true,
         waitConfirmations: 3,
-        skipIfAlreadyDeployed: true
+        //skipIfAlreadyDeployed: true
     })
     await hre.run("verifyContract", { contract: "SpheraHead" })
 }
