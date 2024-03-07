@@ -1,19 +1,13 @@
-<div align="center">
-    <img alt="LayerZero" src="resources/LayerZeroLogo.png"/>
-</div>
-
----
-
 # SpheraHead
 
 ## Deploy Setup
 
 1. Add a `.env` file (to the root project directory) with your `MNEMONIC="your mnemonic"` and fund your wallet in order to deploy!
-2. Follow any of the tutorials below
+2. Follow the steps
 
 # SpheraHead (ONFT721)
 
-This ONFT contract allows minting of `nftId`s on separate chains. To ensure two chains can not mint the same `nftId` each contract on each chain is only allowed to mint`nftIds` in certain ranges.
+This ONFT contract allows minting of `nftId`s on separate chains. To ensure two chains can not mint the same `nftId` each contract on each chain is only allowed to mint `nftIds` in certain ranges.
 
 1. Deploy two contracts:
 
