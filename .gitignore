@@ -110,3 +110,5 @@ cache/
 artifacts/
 .openzeppelin/
 
+# description
+description.txt

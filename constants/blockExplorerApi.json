@@ -15,15 +15,5 @@
   "optimism": "https://api-optimistic.etherscan.io/api",
   "optimism-goerli": "https://api-goerli-optimistic.etherscan.io/api",
   "manta-testnet": "https://pacific-explorer.testnet.manta.network/api",
-
-  "aptos": "",
-  "celo": "",
-  "dexalot": "",
-  "dfk": "",
-  "harmony": "",
-  "intain": "",
-  "klaytn": "",
-  "metis": "",
-  "moonbeam": "https://api-moonbeam.moonscan.io/api",
-  "swimmer": ""
+  "moonbeam": "https://api-moonbeam.moonscan.io/api"
 }

@@ -1,3 +1,5 @@
 {
-    "solidity.defaultCompiler": "remote"
+  "solidity.defaultCompiler": "remote",
+  "slither.solcPath": "",
+  "slither.hiddenDetectors": []
 }
