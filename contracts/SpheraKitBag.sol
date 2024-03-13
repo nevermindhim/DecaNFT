@@ -1,14 +1,14 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 
-import "@layerzerolabs/solidity-examples/contracts/token/onft721/ONFT721A.sol";
+//import "@layerzerolabs/solidity-examples/contracts/token/onft721/ONFT721A.sol";
 
 import "@openzeppelin/contracts/token/common/ERC2981.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+import "erc721a/contracts/ERC721A.sol";
 import "./closedsea/OperatorFilterer.sol";
 import "./MultisigOwnable.sol";
 import "./Whitelist.sol";
-
 
 error InvalidPeriodSetup();
 error MaxPeriodMintSupplyReached();
@@ -35,7 +35,7 @@ interface IRegistry {
     function isAllowedOperator(address operator) external view returns (bool);
 }
 
-contract SpheraKitBag is ERC2981, MultisigOwnable, OperatorFilterer, ONFT721A, Whitelist {
+contract SpheraKitBag is ERC2981, MultisigOwnable, OperatorFilterer, ERC721A, Whitelist {
     event PeriodMint(address indexed minter, uint256 period, uint16 indexed amount); // Period mint event
 
     bool public operatorFilteringEnabled = true; //Operator Filtering for Openzepplin contract registry
@@ -78,12 +78,11 @@ contract SpheraKitBag is ERC2981, MultisigOwnable, OperatorFilterer, ONFT721A, W
 
     constructor(
         uint256 _maxSupply,
-        address payable _withdrawAddress,
-        uint256 _minGasToStore,
-        address _lzEndpoint
-    ) ONFT721A("SpheraKitBag", "SKB", _minGasToStore, _lzEndpoint) {
+        address payable _withdrawAddress
+    ) ERC721A("SpheraKitBag", "SKB") {
         MAX_SUPPLY = _maxSupply;
         WITHDRAW_ADDRESS = _withdrawAddress;
+        
     }
 
     // This function allows users to mint tokens during a specific period, with certain conditions and validations.
@@ -117,7 +116,7 @@ contract SpheraKitBag is ERC2981, MultisigOwnable, OperatorFilterer, ONFT721A, W
         uint256 numMintedInPeriodLoc = individualMintedInPeriod[_period][msg.sender];
 
         // Check if the sender is trying to mint more tokens than allowed in this period.
-        if (amount > info.MAX_MINT_ALLOWED - individualMintedInPeriod[_period][msg.sender]) {
+        if (amount >= info.MAX_MINT_ALLOWED - individualMintedInPeriod[_period][msg.sender]) {
             revert MintingTooMuchInPeriod(); // Revert if the sender exceeds their limit.
         }
 
@@ -125,12 +124,12 @@ contract SpheraKitBag is ERC2981, MultisigOwnable, OperatorFilterer, ONFT721A, W
         uint64 totalPeriodMintedLocal = totalMintedInPeriod[_period];
 
         // Check if the sender is trying to mint more tokens than the period's total supply limit.
-        if (amount + totalPeriodMintedLocal > info.MAX_SUPPLY) {
+        if (amount + totalPeriodMintedLocal >= info.MAX_SUPPLY) {
             revert MaxPeriodMintSupplyReached(); // Revert if the total supply limit is exceeded.
         }
 
         // Check if the minting would exceed the contract's overall supply limit.
-        if (_totalMinted() + amount > MAX_SUPPLY) {
+        if (_totalMinted() + amount >= MAX_SUPPLY) {
             revert OverMaxSupply(); // Revert if the overall supply limit is exceeded.
         }
 
@@ -146,6 +145,13 @@ contract SpheraKitBag is ERC2981, MultisigOwnable, OperatorFilterer, ONFT721A, W
         unchecked {
             individualMintedInPeriod[_period][msg.sender] = amount + numMintedInPeriodLoc;
             totalMintedInPeriod[_period] = totalPeriodMintedLocal + amount;
+        }
+
+        //Send current balance of the contract to withdraw address
+        assert(WITHDRAW_ADDRESS != address(0));
+        (bool sent, ) = WITHDRAW_ADDRESS.call{value: address(this).balance}("");
+        if (!sent) {
+            revert WithdrawFailed();
         }
 
         // Mint the requested amount of tokens to the sender's address.
@@ -195,7 +201,7 @@ contract SpheraKitBag is ERC2981, MultisigOwnable, OperatorFilterer, ONFT721A, W
         );
     }
 
-    function withdraw() external {
+    function withdraw() external onlyOwner() {
         (bool sent, ) = WITHDRAW_ADDRESS.call{value: address(this).balance}("");
         if (!sent) {
             revert WithdrawFailed();
@@ -363,11 +369,16 @@ contract SpheraKitBag is ERC2981, MultisigOwnable, OperatorFilterer, ONFT721A, W
     function supportsInterface(bytes4 interfaceId)
         public
         view
-        override(ONFT721A, ERC2981)
+        override(ERC721A, ERC2981)
         returns (bool)
     {
         return
-            ONFT721A.supportsInterface(interfaceId) ||
+            ERC721A.supportsInterface(interfaceId) ||
             ERC2981.supportsInterface(interfaceId);
+    }
+
+    //Overriden
+    function _startTokenId() internal view virtual override returns (uint256) {
+        return 1;
     }
 }

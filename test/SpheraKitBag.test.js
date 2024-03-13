@@ -84,7 +84,6 @@ describe("SpheraKitBag", function () {
       let txResp = await spheraKitBag.periodMint(1,  3, proof, { value: ethers.utils.parseEther("0.05") });
       let txReceipt = await txResp.wait();
       let gasUsed = ethers.BigNumber.from(txReceipt.gasUsed);
-      console.log(merkleRootHash, proof, gasUsed.toString());
       expect(await spheraKitBag.totalMintedInPeriod(1)).to.equal(3);
     });
 
