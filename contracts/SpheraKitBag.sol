@@ -77,9 +77,11 @@ contract SpheraKitBag is ERC2981, MultisigOwnable, OperatorFilterer, ERC721A, Wh
     address payable public immutable WITHDRAW_ADDRESS;
 
     constructor(
+        string memory _name,
+        string memory _symbol,
         uint256 _maxSupply,
         address payable _withdrawAddress
-    ) ERC721A("SpheraKitBag", "SKB") {
+    ) ERC721A(_name, _symbol) {
         MAX_SUPPLY = _maxSupply;
         WITHDRAW_ADDRESS = _withdrawAddress;
         
@@ -116,7 +118,7 @@ contract SpheraKitBag is ERC2981, MultisigOwnable, OperatorFilterer, ERC721A, Wh
         uint256 numMintedInPeriodLoc = individualMintedInPeriod[_period][msg.sender];
 
         // Check if the sender is trying to mint more tokens than allowed in this period.
-        if (amount >= info.MAX_MINT_ALLOWED - individualMintedInPeriod[_period][msg.sender]) {
+        if (amount > info.MAX_MINT_ALLOWED - individualMintedInPeriod[_period][msg.sender]) {
             revert MintingTooMuchInPeriod(); // Revert if the sender exceeds their limit.
         }
 
@@ -124,12 +126,12 @@ contract SpheraKitBag is ERC2981, MultisigOwnable, OperatorFilterer, ERC721A, Wh
         uint64 totalPeriodMintedLocal = totalMintedInPeriod[_period];
 
         // Check if the sender is trying to mint more tokens than the period's total supply limit.
-        if (amount + totalPeriodMintedLocal >= info.MAX_SUPPLY) {
+        if (amount + totalPeriodMintedLocal > info.MAX_SUPPLY) {
             revert MaxPeriodMintSupplyReached(); // Revert if the total supply limit is exceeded.
         }
 
         // Check if the minting would exceed the contract's overall supply limit.
-        if (_totalMinted() + amount >= MAX_SUPPLY) {
+        if (_totalMinted() + amount > MAX_SUPPLY) {
             revert OverMaxSupply(); // Revert if the overall supply limit is exceeded.
         }
 

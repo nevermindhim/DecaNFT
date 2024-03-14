@@ -24,7 +24,7 @@ describe("SpheraKitBag", function () {
 
     // Deploy the SpheraKitBag contract
     SpheraKitBag = await ethers.getContractFactory("SpheraKitBag");
-    spheraKitBag = await SpheraKitBag.deploy(1000, owner.address,  21000, "0x1234567890123456789012345678901234567890");
+    spheraKitBag = await SpheraKitBag.deploy(1000, owner.address);
     await spheraKitBag.deployed();
 
     whitelist.push(owner.address);

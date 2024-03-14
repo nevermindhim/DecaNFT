@@ -1,25 +1,23 @@
-const LZ_ENDPOINTS = require("../constants/layerzeroEndpoints.json")
-const CHAIN_IDS = require("../constants/chainIds.json");
+const deployArgs = require('../constants/spheraKitBagDeployArgs.json');
 
 module.exports = async function ({ deployments, getNamedAccounts }) {
     const { deploy } = deployments
     const { deployer } = await getNamedAccounts()
 
     console.log(`>>> your address: ${deployer}`)
+    console.log(deployArgs.withdrawAddress);
     
-    const lzEndpointAddress = LZ_ENDPOINTS[hre.network.name]
-    console.log(`[${hre.network.name}] Endpoint Address: ${lzEndpointAddress}`)
-
-    // get the Endpoint address
-    const _maxSupply = 3000;
-    const _withdrawAddress = "0x43b1DB0EC2167C8811cA0216A35B3bEfc339689c";
     await deploy("SpheraKitBag", {
         from: deployer,
-        args: [_maxSupply, _withdrawAddress, 100000, lzEndpointAddress],
+        args: [deployArgs.name, deployArgs.symbol, deployArgs.maxSupply, deployArgs.withdrawAddress],
         log: true,
-        waitConfirmations: 3,
-        //skipIfAlreadyDeployed: true
+        waitConfirmations: 3
     })
+    console.log(`Contract was deployed with\n
+        name: ${deployArgs.name}\n
+        symbol: ${deployArgs.symbol}\n
+        maxSupply: ${deployArgs.maxSupply}\n
+        withDrawAddress: ${deployArgs.withdrawAddress}`);
     await hre.run("verifyContract", { contract: "SpheraKitBag" })
 }
 

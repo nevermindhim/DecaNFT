@@ -97,7 +97,7 @@ contract SpheraHead is ERC2981, ONFT721, MultisigOwnable, OperatorFilterer {
         return tokenIds;
     }
 
-    // Generates a pseudorandom number between [0,MAX_SUPPLY) that has not yet been generated before, in O(1) time.
+    // Generates a pseudorandom number between [1,MAX_SUPPLY) that has not yet been generated before, in O(1) time.
     //
     // Uses Durstenfeld's version of the Yates Shuffle https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle
     // with a twist to avoid having to manually spend gas to preset an array's values to be values 0...n.
@@ -124,7 +124,7 @@ contract SpheraHead is ERC2981, ONFT721, MultisigOwnable, OperatorFilterer {
         }
 
         uint256 randomNum = _getRandomNum(numAvailableRemainingTokens);
-        uint256 randomIndex = randomNum % numAvailableRemainingTokens;
+        uint256 randomIndex = randomNum % numAvailableRemainingTokens + 1;
         uint256 valAtIndex = _availableRemainingTokens[randomIndex];
 
         uint256 result;
@@ -136,7 +136,7 @@ contract SpheraHead is ERC2981, ONFT721, MultisigOwnable, OperatorFilterer {
             result = valAtIndex;
         }
 
-        uint256 lastIndex = numAvailableRemainingTokens - 1;
+        uint256 lastIndex = numAvailableRemainingTokens;
         if (randomIndex != lastIndex) {
             // Replace the value at randomIndex, now that it's been used.
             // Replace it with the data from the last index in the array, since we are going to decrease the array size afterwards.
