@@ -24,7 +24,7 @@ describe("SpheraKitBag", function () {
 
     // Deploy the SpheraKitBag contract
     SpheraKitBag = await ethers.getContractFactory("SpheraKitBag");
-    spheraKitBag = await SpheraKitBag.deploy(1000, owner.address,  21000, "0x1234567890123456789012345678901234567890");
+    spheraKitBag = await SpheraKitBag.deploy(1000, owner.address);
     await spheraKitBag.deployed();
 
     whitelist.push(owner.address);
@@ -84,7 +84,6 @@ describe("SpheraKitBag", function () {
       let txResp = await spheraKitBag.periodMint(1,  3, proof, { value: ethers.utils.parseEther("0.05") });
       let txReceipt = await txResp.wait();
       let gasUsed = ethers.BigNumber.from(txReceipt.gasUsed);
-      console.log(merkleRootHash, proof, gasUsed.toString());
       expect(await spheraKitBag.totalMintedInPeriod(1)).to.equal(3);
     });
 

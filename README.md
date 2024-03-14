@@ -1,4 +1,4 @@
-# SpheraHead (ONFT721)
+# SpheraWorld
 
 ## Deploy Setup
 
