@@ -2,28 +2,25 @@
 // Source: https://github.com/tubby-cats/dual-ownership-nft
 pragma solidity ^0.8.4;
 
-import '@openzeppelin/contracts/access/Ownable.sol';
+import "@openzeppelin/contracts/access/Ownable.sol";
 
 abstract contract MultisigOwnable is Ownable {
-  address public realOwner;
+    address public realOwner;
 
-  constructor() {
-    realOwner = msg.sender;
-  }
+    constructor() {
+        realOwner = msg.sender;
+    }
 
-  modifier onlyRealOwner() {
-    require(
-      realOwner == msg.sender,
-      'MultisigOwnable: caller is not the real owner'
-    );
-    _;
-  }
+    modifier onlyRealOwner() {
+        require(realOwner == msg.sender, "MultisigOwnable: caller is not the real owner");
+        _;
+    }
 
-  function transferRealOwnership(address newRealOwner) public onlyRealOwner {
-    realOwner = newRealOwner;
-  }
+    function transferRealOwnership(address newRealOwner) public onlyRealOwner {
+        realOwner = newRealOwner;
+    }
 
-  function transferLowerOwnership(address newOwner) public onlyRealOwner {
-    transferOwnership(newOwner);
-  }
+    function transferLowerOwnership(address newOwner) public onlyRealOwner {
+        transferOwnership(newOwner);
+    }
 }
