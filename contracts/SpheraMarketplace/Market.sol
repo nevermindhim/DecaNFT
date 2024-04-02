@@ -411,19 +411,11 @@ contract Market is HederaTokenService {
         if (royalty.numerator > 0) {
             uint royaltyAmount = ownerRewardAmount * uint(int(royalty.numerator / royalty.denominator));
 
-            (bool royaltySent, ) = payable(royalty.feeCollector).call{value: royaltyAmount}("");
-            require(royaltySent, "Failed to send royalty Sph");
+            // (bool royaltySent, ) = payable(royalty.feeCollector).call{value: royaltyAmount}("");
+            // require(royaltySent, "Failed to send royalty Sph");
 
-            // int response = HederaTokenService.transferToken(
-            //     spheraTokenAddress,
-            //     address(this),
-            //     royalty.feeCollector,
-            //     int64(uint64(royaltyAmount))
-            // );
-            // require(
-            //     response == HederaResponseCodes.SUCCESS,
-            //     "Failed to send royalty Sph"
-            // );
+            int response = HederaTokenService.transferToken(spheraTokenAddress, address(this), royalty.feeCollector, int64(uint64(royaltyAmount)));
+            require(response == HederaResponseCodes.SUCCESS, "Failed to send royalty Sph");
 
             ownerRewardAmount -= royaltyAmount;
         }
