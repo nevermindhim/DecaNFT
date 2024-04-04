@@ -23,14 +23,10 @@ interface IRegistry {
 }
 
 contract SpheraHead is ERC2981, ONFT721, MultisigOwnable, OperatorFilterer {
-    using Strings for uint256;
+    using Strings for uint;
     using BitMaps for BitMaps.BitMap;
 
-    event BagRedeemed(
-        address indexed to,
-        uint256 indexed tokenId,
-        uint256 indexed bagId
-    );
+    event BagRedeemed(address indexed to, uint indexed tokenId, uint indexed bagId);
 
     bool public operatorFilteringEnabled = true;
     bool public isRegistryActive = false;
@@ -47,13 +43,7 @@ contract SpheraHead is ERC2981, ONFT721, MultisigOwnable, OperatorFilterer {
     // Data structure used for Fisher Yates shuffle
     uint16[65536] internal _availableRemainingTokens;
 
-    constructor(
-        string memory _name,
-        string memory _symbol,
-        uint16 maxSupply_,
-        uint256 _minGasToStore,
-        address _lzEndpoint
-    ) ONFT721(_name, _symbol, _minGasToStore, _lzEndpoint) {
+    constructor(string memory _name, string memory _symbol, uint16 maxSupply_, uint _minGasToStore, address _lzEndpoint) ONFT721(_name, _symbol, _minGasToStore, _lzEndpoint) {
         MAX_SUPPLY = maxSupply_;
         _numAvailableRemainingTokens = maxSupply_;
 
@@ -61,14 +51,10 @@ contract SpheraHead is ERC2981, ONFT721, MultisigOwnable, OperatorFilterer {
         operatorFilteringEnabled = true;
     }
 
-
     // ------------
     // Redeem bags
     // ------------
-    function redeemBags(address to, uint256[] calldata bagIds)
-        public
-        returns (uint256[] memory)
-    {
+    function redeemBags(address to, uint[] calldata bagIds) public returns (uint[] memory) {
         RedeemInfo memory info = redeemInfo;
 
         if (!info.redeemBagOpen) {
@@ -78,14 +64,14 @@ contract SpheraHead is ERC2981, ONFT721, MultisigOwnable, OperatorFilterer {
             revert InvalidRedeemer();
         }
 
-        uint256 amount = bagIds.length;
-        uint256[] memory tokenIds = new uint256[](amount);
+        uint amount = bagIds.length;
+        uint[] memory tokenIds = new uint[](amount);
 
         // Assume data has already been validated by the bag contract
-        for (uint256 i; i < amount; ) {
-            uint256 bagId = bagIds[i];
+        for (uint i; i < amount; ) {
+            uint bagId = bagIds[i];
 
-            uint256 tokenId = _useRandomAvailableTokenId();
+            uint tokenId = _useRandomAvailableTokenId();
             // Don't need safeMint, as the calling address has a SpheraKitBag in it already
             _mint(to, tokenId);
             emit BagRedeemed(to, tokenId, bagId);
@@ -117,17 +103,17 @@ contract SpheraHead is ERC2981, ONFT721, MultisigOwnable, OperatorFilterer {
     //    - update the _availableRemainingTokens mapping state
     //        - set _availableRemainingTokens[randIndex] to either the index or the value of the last entry in the mapping (depends on the last entry's state)
     //        - decrement _numAvailableRemainingTokens to mimic the shrinking of an array
-    function _useRandomAvailableTokenId() internal returns (uint256) {
-        uint256 numAvailableRemainingTokens = _numAvailableRemainingTokens;
+    function _useRandomAvailableTokenId() internal returns (uint) {
+        uint numAvailableRemainingTokens = _numAvailableRemainingTokens;
         if (numAvailableRemainingTokens == 0) {
             revert NoMoreTokenIds();
         }
 
-        uint256 randomNum = _getRandomNum(numAvailableRemainingTokens);
-        uint256 randomIndex = randomNum % numAvailableRemainingTokens + 1;
-        uint256 valAtIndex = _availableRemainingTokens[randomIndex];
+        uint randomNum = _getRandomNum(numAvailableRemainingTokens);
+        uint randomIndex = (randomNum % numAvailableRemainingTokens) + 1;
+        uint valAtIndex = _availableRemainingTokens[randomIndex];
 
-        uint256 result;
+        uint result;
         if (valAtIndex == 0) {
             // This means the index itself is still an available token
             result = randomIndex;
@@ -136,11 +122,11 @@ contract SpheraHead is ERC2981, ONFT721, MultisigOwnable, OperatorFilterer {
             result = valAtIndex;
         }
 
-        uint256 lastIndex = numAvailableRemainingTokens;
+        uint lastIndex = numAvailableRemainingTokens;
         if (randomIndex != lastIndex) {
             // Replace the value at randomIndex, now that it's been used.
             // Replace it with the data from the last index in the array, since we are going to decrease the array size afterwards.
-            uint256 lastValInArray = _availableRemainingTokens[lastIndex];
+            uint lastValInArray = _availableRemainingTokens[lastIndex];
             if (lastValInArray == 0) {
                 // This means the index itself is still an available token
                 // Cast is safe as we know that lastIndex cannot > MAX_SUPPLY, which is a uint16
@@ -159,22 +145,8 @@ contract SpheraHead is ERC2981, ONFT721, MultisigOwnable, OperatorFilterer {
     }
 
     // On-chain randomness tradeoffs are acceptable here as it's only used for the SpheraHead's id number itself, not the resulting Elemental's metadata (which is determined by the source SpheraKitBag).
-    function _getRandomNum(uint256 numAvailableRemainingTokens)
-        internal
-        view
-        returns (uint256)
-    {
-        return
-            uint256(
-                keccak256(
-                    abi.encode(
-                        block.prevrandao,
-                        blockhash(block.number - 1),
-                        address(this),
-                        numAvailableRemainingTokens
-                    )
-                )
-            );
+    function _getRandomNum(uint numAvailableRemainingTokens) internal view returns (uint) {
+        return uint(keccak256(abi.encode(block.prevrandao, blockhash(block.number - 1), address(this), numAvailableRemainingTokens)));
     }
 
     function setBagAddress(address contractAddress) external onlyOwner {
@@ -192,7 +164,7 @@ contract SpheraHead is ERC2981, ONFT721, MultisigOwnable, OperatorFilterer {
     // ------------
     // Total Supply
     // ------------
-    function totalSupply() external view returns (uint256) {
+    function totalSupply() external view returns (uint) {
         unchecked {
             // Does not need to account for burns as they aren't supported.
             return MAX_SUPPLY - _numAvailableRemainingTokens;
@@ -202,20 +174,12 @@ contract SpheraHead is ERC2981, ONFT721, MultisigOwnable, OperatorFilterer {
     // --------
     // Metadata
     // --------
-    function tokenURI(uint256 tokenId)
-        public
-        view
-        override
-        returns (string memory)
-    {
+    function tokenURI(uint tokenId) public view override returns (string memory) {
         if (ownerOf(tokenId) == address(0)) {
             revert InvalidTokenId();
         }
         string memory baseURI = _getBaseURIForToken(tokenId);
-        return
-            bytes(baseURI).length > 0
-                ? string(abi.encodePacked(baseURI, tokenId.toString()))
-                : "";
+        return bytes(baseURI).length > 0 ? string(abi.encodePacked(baseURI, tokenId.toString())) : "";
     }
 
     string private _baseTokenURI;
@@ -223,30 +187,20 @@ contract SpheraHead is ERC2981, ONFT721, MultisigOwnable, OperatorFilterer {
     // Keys are SpheraHead token ids
     BitMaps.BitMap private _isUriPermanentForToken;
 
-    function _getBaseURIForToken(uint256 tokenId)
-        private
-        view
-        returns (string memory)
-    {
-        return
-            _isUriPermanentForToken.get(tokenId)
-                ? _baseTokenURIPermanent
-                : _baseTokenURI;
+    function _getBaseURIForToken(uint tokenId) private view returns (string memory) {
+        return _isUriPermanentForToken.get(tokenId) ? _baseTokenURIPermanent : _baseTokenURI;
     }
 
     function setBaseURI(string calldata baseURI) external onlyOwner {
         _baseTokenURI = baseURI;
     }
 
-    function setBaseURIPermanent(string calldata baseURIPermanent)
-        external
-        onlyOwner
-    {
+    function setBaseURIPermanent(string calldata baseURIPermanent) external onlyOwner {
         _baseTokenURIPermanent = baseURIPermanent;
     }
 
-    function setIsUriPermanent(uint256[] calldata tokenIds) external onlyOwner {
-        for (uint256 i = 0; i < tokenIds.length; ) {
+    function setIsUriPermanent(uint[] calldata tokenIds) external onlyOwner {
+        for (uint i = 0; i < tokenIds.length; ) {
             _isUriPermanentForToken.set(tokenIds[i]);
             unchecked {
                 ++i;
@@ -257,29 +211,18 @@ contract SpheraHead is ERC2981, ONFT721, MultisigOwnable, OperatorFilterer {
     // --------
     // EIP-2981
     // --------
-    function setDefaultRoyalty(address receiver, uint96 feeNumerator)
-        external
-        onlyOwner
-    {
+    function setDefaultRoyalty(address receiver, uint96 feeNumerator) external onlyOwner {
         _setDefaultRoyalty(receiver, feeNumerator);
     }
 
-    function setTokenRoyalty(
-        uint256 tokenId,
-        address receiver,
-        uint96 feeNumerator
-    ) external onlyOwner {
+    function setTokenRoyalty(uint tokenId, address receiver, uint96 feeNumerator) external onlyOwner {
         _setTokenRoyalty(tokenId, receiver, feeNumerator);
     }
 
     // ---------------------------------------------------
     // OperatorFilterer overrides (overrides, values etc.)
     // ---------------------------------------------------
-    function setApprovalForAll(address operator, bool approved)
-        public
-        override(ERC721, IERC721)
-        onlyAllowedOperatorApproval(operator)
-    {
+    function setApprovalForAll(address operator, bool approved) public override(ERC721, IERC721) onlyAllowedOperatorApproval(operator) {
         super.setApprovalForAll(operator, approved);
     }
 
@@ -291,11 +234,7 @@ contract SpheraHead is ERC2981, ONFT721, MultisigOwnable, OperatorFilterer {
         return operatorFilteringEnabled;
     }
 
-    function approve(address operator, uint256 tokenId)
-        public
-        override(ERC721, IERC721)
-        onlyAllowedOperatorApproval(operator)
-    {
+    function approve(address operator, uint tokenId) public override(ERC721, IERC721) onlyAllowedOperatorApproval(operator) {
         super.approve(operator, tokenId);
     }
 
@@ -304,22 +243,14 @@ contract SpheraHead is ERC2981, ONFT721, MultisigOwnable, OperatorFilterer {
     // --------------
     // Solbase ERC721 calls transferFrom internally in its two safeTransferFrom functions, so we don't need to override those.
     // Also, onlyAllowedOperator is from closedsea
-    function transferFrom(
-        address from,
-        address to,
-        uint256 id
-    ) public override(ERC721, IERC721) onlyAllowedOperator(from) {
+    function transferFrom(address from, address to, uint id) public override(ERC721, IERC721) onlyAllowedOperator(from) {
         if (!_isValidAgainstRegistry(msg.sender)) {
             revert NotAllowedByRegistry();
         }
         super.transferFrom(from, to, id);
     }
 
-    function _isValidAgainstRegistry(address operator)
-        internal
-        view
-        returns (bool)
-    {
+    function _isValidAgainstRegistry(address operator) internal view returns (bool) {
         if (isRegistryActive) {
             IRegistry registry = IRegistry(registryAddress);
             return registry.isAllowedOperator(operator);
@@ -335,17 +266,11 @@ contract SpheraHead is ERC2981, ONFT721, MultisigOwnable, OperatorFilterer {
     function setRegistryAddress(address _registryAddress) external onlyOwner {
         registryAddress = _registryAddress;
     }
+
     // -------
     // EIP-165
     // -------
-    function supportsInterface(bytes4 interfaceId)
-        public
-        view
-        override(ONFT721, ERC2981)
-        returns (bool)
-    {
-        return
-            ONFT721.supportsInterface(interfaceId) ||
-            ERC2981.supportsInterface(interfaceId);
+    function supportsInterface(bytes4 interfaceId) public view override(ONFT721, ERC2981) returns (bool) {
+        return ONFT721.supportsInterface(interfaceId) || ERC2981.supportsInterface(interfaceId);
     }
 }

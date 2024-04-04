@@ -1,6 +1,5 @@
 const LZ_ENDPOINTS = require("../constants/layerzeroEndpoints.json")
-const deployArgs = require('../constants/spheraHeadDeployArgs.json');
-
+const deployArgs = require("../constants/spheraHeadDeployArgs.json")
 
 module.exports = async function ({ deployments, getNamedAccounts }) {
     const { deploy } = deployments
@@ -15,12 +14,12 @@ module.exports = async function ({ deployments, getNamedAccounts }) {
         from: deployer,
         args: [deployArgs.name, deployArgs.symbol, deployArgs.maxSupply, 100000, lzEndpointAddress],
         log: true,
-        waitConfirmations: 3
+        waitConfirmations: 3,
     })
     console.log(`Contract was deployed with\n
         name: ${deployArgs.name}\n
         symbol: ${deployArgs.symbol}\n
-        maxSupply: ${deployArgs.maxSupply}\n`);
+        maxSupply: ${deployArgs.maxSupply}\n`)
     await hre.run("verifyContract", { contract: "SpheraHead" })
 }
 
