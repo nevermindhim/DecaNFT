@@ -5,7 +5,7 @@ import "./HederaTokenService.sol";
 import "./IHederaTokenService.sol";
 import "./HederaResponseCodes.sol";
 
-contract Market is HederaTokenService {
+contract Market_Hedera is HederaTokenService {
     // Error Codes
     enum MarketResponseCodes {
         SUCCESS,
@@ -156,6 +156,10 @@ contract Market is HederaTokenService {
         spheraTokenAddress = _tokenAddress;
     }
 
+    function setTreasuryWalletAddress(address _walletAddress) public onlyContractOwner {
+        treasuryWalletAddress = _walletAddress;
+    }
+
     function sendSphs(address sender, address recipient, uint amount) internal {
         require(buyersTokens[sender].sphs >= amount, "Not enough user sphs on the contract!");
 
@@ -280,10 +284,6 @@ contract Market is HederaTokenService {
         return response;
     }
 
-    function sendSphsToContract() external payable returns (uint) {
-        return uint(MarketResponseCodes.SUCCESS);
-    }
-
     function getTokenBid(address _token, uint _serialNumber, address _buyer) public view returns (Bid memory) {
         string memory nftId = formatNftId(_token, _serialNumber);
 
@@ -401,6 +401,7 @@ contract Market is HederaTokenService {
         if (taxFee > 0) {
             uint taxAmount = ownerRewardAmount * uint(int(taxFee / 1000));
 
+            require(treasuryWalletAddress != address(0), "Treasury wallet address not set up.");
             int response = HederaTokenService.transferToken(spheraTokenAddress, address(this), treasuryWalletAddress, int64(uint64(taxAmount)));
             require(response == HederaResponseCodes.SUCCESS, "Failed to send tax Sph.");
 

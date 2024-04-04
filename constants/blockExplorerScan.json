@@ -11,5 +11,5 @@
   "OPTIMISM": "https://api-optimistic.etherscan.io/api",
   "POLYGON": "https://api.polygonscan.com/api",
   "POLYGON_TESTNET": "https://api-testnet.polygonscan.com/api",
-  "BLAST-TESTNET": "https://testnet.blastscan.io/"
+  "blast-testnet": "https://testnet.blastscan.io/"
 }

@@ -6,7 +6,7 @@ module.exports = async function ({ deployments, getNamedAccounts }) {
 
     await deploy("SpheraToken", {
         from: deployer,
-        args: ["SpheraToken", "SPH"],
+        args: ["SpheraToken", "SPH", deployer],
         log: true,
         waitConfirmations: 3,
     })

@@ -169,7 +169,6 @@ module.exports = {
         apiKey: {
             mainnet: "5KKUIPX5EDA1KX2RU7ZSAKYWMEJWPZQT4X",
             sepolia: "5KKUIPX5EDA1KX2RU7ZSAKYWMEJWPZQT4X",
-            "blast-testnet": "blast-testnet",
         },
     },
 }
