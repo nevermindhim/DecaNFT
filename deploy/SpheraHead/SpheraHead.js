@@ -1,5 +1,5 @@
-const LZ_ENDPOINTS = require("../constants/layerzeroEndpoints.json")
-const deployArgs = require("../constants/spheraHeadDeployArgs.json")
+const LZ_ENDPOINTS = require("../../constants/layerzeroEndpoints.json")
+const deployArgs = require("../../constants/spheraHeadDeployArgs.json")
 
 module.exports = async function ({ deployments, getNamedAccounts }) {
     const { deploy } = deployments
